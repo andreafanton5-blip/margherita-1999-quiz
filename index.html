@@ -242,17 +242,25 @@ function loadQuestion() {
 function selectAnswer(index) {
   if (index === questions[current].correct) {
     score++;
-    showBubble('✔ CORRECT','correct-bubble');
+    showBubble('✔ MEMORY UNLOCKED','correct-bubble');
   } else {
     document.body.classList.add('wrong');
-    showBubble('✖ WRONG','wrong-bubble');
+    showBubble('✖ ACCESS DENIED','wrong-bubble');
   }
 
   setTimeout(() => {
-    document.body.classList.remove('wrong');
+  document.body.classList.remove('wrong');
+
+  const transitionType =
+    index === questions[current].correct ? 'correct' : 'wrong';
+
+  showTransition(transitionType, () => {
     current++;
     current < questions.length ? loadQuestion() : showFinal();
-  }, 700);
+  });
+
+}, 700);
+
 }
 
 function showBubble(text, cls) {
@@ -262,6 +270,37 @@ function showBubble(text, cls) {
   document.body.appendChild(bubble);
   setTimeout(() => bubble.remove(), 900);
 }
+  function showTransition(type, callback) {
+  const overlay = document.createElement('div');
+  overlay.className = 'transition';
+
+  let text;
+
+  if (type === 'correct') {
+    text = `> loading_memory_fragment_${Math.floor(Math.random() * 90 + 10)}...\n> decoding_1999.exe...`;
+  } else {
+    // rare creepy message (~15%)
+    const rare = Math.random() < 0.15;
+
+    text = rare
+      ? `> DATA CORRUPTION DETECTED\n> UNKNOWN VARIABLE: YOU`
+      : `> DATA CORRUPTION DETECTED\n> RECOVERING CORRUPTED DATA...`;
+  }
+
+  overlay.innerHTML = `
+    <div class="transition-box">
+      ${text.replace(/\n/g, '<br>')}
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  setTimeout(() => {
+    overlay.remove();
+    callback();
+  }, 450);
+}
+
 
 function showFinal() {
   quizSection.classList.add('hidden');
@@ -275,8 +314,8 @@ function showFinal() {
     : p > 0.7
     ? '📼 I can tell you were born in the 90s'
     : p > 0.4
-    ? '🕶️ Bene ma non benissimo'
-    : '👶 Born after 2000';
+    ? '🕶️ Casual Matrix observer'
+    : '🧨 FATAL ERROR, MEMORY LOST';
 }
 
 function restartQuiz() {
@@ -329,6 +368,7 @@ setInterval(drawMatrix, 33);
 
 </body>
 </html>
+
 
 
 
